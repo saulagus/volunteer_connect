@@ -36,20 +36,20 @@ CREATE TABLE IF NOT EXISTS events (
     status ENUM('active', 'cancelled') DEFAULT 'active',
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (organiser_id) REFERENCES users(user_id)
+    FOREIGN KEY (organiser_id) REFERENCES users(user_id),
     FOREIGN KEY (category_id) REFERENCES categories(category_id)
 ) ;
 
 -- bookings: tracks which attendee signed up for which event
 CREATE TABLE IF NOT EXISTS bookings (
     booking_id INT AUTO_INCREMENT PRIMARY KEY,
-    userId   INT NOT NULL,
-    eventId  INT NOT NULL,
+    user_id   INT NOT NULL,
+    event_id  INT NOT NULL,
     booking_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status ENUM('booked', 'cancelled', 'attended') DEFAULT 'booked',
-    UNIQUE KEY uniqueBooking (userId, eventId),
+    UNIQUE KEY uniqueBooking (user_id, event_id),
     FOREIGN KEY (user_id)  REFERENCES users(user_id),
-    FOREIGN KEY (event_id) REFERENCES events(event_id)
+    FOREIGN KEY (event_id) REFERENCES events(event_id) ON DELETE CASCADE
 );
 
 -- TODO: Add seed
