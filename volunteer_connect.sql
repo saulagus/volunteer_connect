@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS events (
     capacity INT UNSIGNED NOT NULL,
     organiserId INT NOT NULL,
     categoryId INT,
-    status ENUM('draft', 'published', 'full', 'inProgress', 'completed', 'cancelled') DEFAULT 'draft',
+    status ENUM('active', 'full', 'completed', 'cancelled') DEFAULT 'active',
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (organiserId) REFERENCES users(userId),
