@@ -3,6 +3,9 @@ session_start();
 // Database connection
 require_once 'db_connect.php'; 
 
+// Initialize error as empty
+$error = ""; 
+
 // Check if form was submitted
 if (isset($_POST['login_btn'])) {
     $email = $_POST['email'];
@@ -24,7 +27,6 @@ if (isset($_POST['login_btn'])) {
 
         // Verify the hashed password
         if (password_verify($password, $user['password'])) {
-            
             // Regenerate session ID for security
             session_regenerate_id();
 
@@ -32,6 +34,10 @@ if (isset($_POST['login_btn'])) {
             $_SESSION['user_id'] = $user['userId'];
             $_SESSION['user_name'] = $user['name'];
             $_SESSION['user_role'] = $user['role'];
+
+            // Close connection before redirecting
+            $stmt->close();
+            $conn->close();
 
             // Redirect based on role
             switch ($_SESSION['user_role']) {
@@ -42,10 +48,8 @@ if (isset($_POST['login_btn'])) {
                 header("Location: organiser/dashboard.php");
                 break;
             case 'attendee':
-                header("Location: attendeeS/dashboard.php");
+                header("Location: attendee/dashboard.php");
                 break;
-            default:
-                header("Location: login.php");
             }
             exit();
             
@@ -59,11 +63,6 @@ if (isset($_POST['login_btn'])) {
     $stmt->close();
 }
 
-// If there's an error, redirect back to login with a message
-if (isset($error)) {
-    header("Location: login.php?error=" . urlencode($error));
-    exit();
-}
 ?>
 
 <!DOCTYPE html>
@@ -73,7 +72,16 @@ if (isset($error)) {
 </head>
 <body>
     <h2>Login to Manage Events</h2>
-    <form action="login_process.php" method="POST">
+
+    <?php if ($error !== ""): ?>
+        <p style="color: red;"><?php echo $error; ?></p>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['error']) && $_GET['error'] == 'unauthorized'): ?>
+        <p style="color: red;">Please login to access that page.</p>
+    <?php endif; ?>
+
+    <form action="login.php" method="POST">
         <label>Email:</label><br>
         <input type="email" name="email" required><br><br>
         
@@ -85,3 +93,4 @@ if (isset($error)) {
 </body>
 </html>
 
+<?php $conn->close(); ?>
