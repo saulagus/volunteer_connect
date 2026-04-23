@@ -12,7 +12,7 @@ function require_role($required_role) {
     // make sure they're logged in first
     require_login();
     // kick out if not authorized role
-    if ($_SESSION['role'] !== $required_role) {
+    if ($_SESSION['user_role'] !== $required_role) {
         header('Location: /index.php?error=unauthorised');
         exit();
     }
@@ -33,8 +33,8 @@ function is_logged_in() {
 
 function current_role() {
     // used in header.php to show the right nav links per role
-    if (isset($_SESSION['role'])) {
-        return $_SESSION['role'];
+    if (isset($_SESSION['user_role'])) {
+        return $_SESSION['user_role'];
     }
     return null;
 }
