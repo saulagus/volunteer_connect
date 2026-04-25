@@ -7,8 +7,8 @@ require_once '../includes/auth.php';
 require_role('admin');
 // fetch newest users first
 $result = $conn->query(
-    "SELECT id, name, email, role, createdAt 
-    FROM users 
+    "SELECT userId, name, email, role, createdAt
+    FROM users
     ORDER BY createdAt DESC");
 // collect all rows into an array to loop through in the HTML
 $users = [];
@@ -41,9 +41,9 @@ while ($row !== null) {
                 <td><?= htmlspecialchars($user['role']) ?></td>
                 <td><?= htmlspecialchars($user['createdAt']) ?></td>
                 <td>
-                    <a href="edit_user.php?id=<?= (int)$user['id'] ?>">Edit</a>
+                    <a href="edit_user.php?id=<?= (int)$user['userId'] ?>">Edit</a>
                     <form method="POST" action="delete_user.php">
-                        <input type="hidden" name="id" value="<?= (int)$user['id'] ?>">
+                        <input type="hidden" name="id" value="<?= (int)$user['userId'] ?>">
                         <button type="submit">Delete</button>
                     </form>
                 </td>

@@ -33,9 +33,9 @@ if ($id === 0) {
 
 // fetch the user from the database
 $stmt = $conn->prepare(
-    "SELECT id, name, email, role 
-    FROM users 
-    WHERE id = ?");
+    "SELECT userId, name, email, role
+    FROM users
+    WHERE userId = ?");
 // bind the id parameter and execute the query
 $stmt->bind_param("i", $id);
 $stmt->execute();
@@ -94,8 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // check if the email is already taken by a different user
     if (empty($errors)) {
         $stmt = $conn->prepare(
-            "SELECT id FROM users 
-            WHERE email = ? AND id != ?");
+            "SELECT userId FROM users
+            WHERE email = ? AND userId != ?");
         $stmt->bind_param("si", $email, $id);
         $stmt->execute();
         $checkResult = $stmt->get_result();
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // only update if there are no errors
     if (empty($errors)) {
-        $stmt = $conn->prepare("UPDATE users SET name = ?, email = ?, role = ? WHERE id = ?");
+        $stmt = $conn->prepare("UPDATE users SET name = ?, email = ?, role = ? WHERE userId = ?");
         $stmt->bind_param("sssi", $name, $email, $role, $id);
         $stmt->execute();
         $stmt->close();
@@ -139,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </ul>
     <?php endif; ?>
     <form method="POST" action="edit_user.php">
-        <input type="hidden" name="id" value="<?= (int)$user['id'] ?>">
+        <input type="hidden" name="id" value="<?= (int)$user['userId'] ?>">
         <label for="name">Name</label>
         <input type="text" id="name" name="name" value="<?= htmlspecialchars($name) ?>">
         <label for="email">Email</label>
