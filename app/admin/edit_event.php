@@ -8,9 +8,17 @@ require_role('admin');
 
 // get event id from URL on GET, or from hidden field on POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $eventId = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+    if (isset($_POST['id'])) {
+        $eventId = (int)$_POST['id'];
+    } else {
+        $eventId = 0;
+    }
 } else {
-    $eventId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+    if (isset($_GET['id'])) {
+        $eventId = (int)$_GET['id'];
+    } else {
+        $eventId = 0;
+    }
 }
 
 if ($eventId <= 0) {
@@ -25,7 +33,8 @@ $stmt = $conn->prepare(
      WHERE eventId = ?");
 $stmt->bind_param("i", $eventId);
 $stmt->execute();
-$event = $stmt->get_result()->fetch_assoc();
+$result = $stmt->get_result();
+$event  = $result->fetch_assoc();
 $stmt->close();
 
 if (!$event) {
@@ -45,13 +54,41 @@ while ($row !== null) {
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title       = isset($_POST['title'])       ? trim($_POST['title'])       : '';
-    $description = isset($_POST['description']) ? trim($_POST['description']) : '';
-    $location    = isset($_POST['location'])    ? trim($_POST['location'])    : '';
-    $eventDate   = isset($_POST['eventDate'])   ? trim($_POST['eventDate'])   : '';
-    $capacity    = isset($_POST['capacity'])    ? (int)$_POST['capacity']     : 0;
-    $categoryId  = isset($_POST['categoryId'])  ? (int)$_POST['categoryId']  : 0;
-    $status      = isset($_POST['status'])      ? trim($_POST['status'])      : '';
+    if (isset($_POST['title'])) {
+        $title = trim($_POST['title']);
+    } else {
+        $title = '';
+    }
+    if (isset($_POST['description'])) {
+        $description = trim($_POST['description']);
+    } else {
+        $description = '';
+    }
+    if (isset($_POST['location'])) {
+        $location = trim($_POST['location']);
+    } else {
+        $location = '';
+    }
+    if (isset($_POST['eventDate'])) {
+        $eventDate = trim($_POST['eventDate']);
+    } else {
+        $eventDate = '';
+    }
+    if (isset($_POST['capacity'])) {
+        $capacity = (int)$_POST['capacity'];
+    } else {
+        $capacity = 0;
+    }
+    if (isset($_POST['categoryId'])) {
+        $categoryId = (int)$_POST['categoryId'];
+    } else {
+        $categoryId = 0;
+    }
+    if (isset($_POST['status'])) {
+        $status = trim($_POST['status']);
+    } else {
+        $status = '';
+    }
 
     if ($title === '') {
         $errors[] = 'Title is required.';
@@ -84,8 +121,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
              SET title = ?, description = ?, location = ?, eventDate = ?,
                  capacity = ?, categoryId = ?, status = ?
              WHERE eventId = ?");
-        // categoryId can be null if 0
-        $catParam = $categoryId > 0 ? $categoryId : null;
+        if ($categoryId > 0) {
+            $catParam = $categoryId;
+        } else {
+            $catParam = null;
+        }
         $stmt->bind_param("ssssiisi", $title, $description, $location, $eventDate,
                           $capacity, $catParam, $status, $eventId);
         $stmt->execute();

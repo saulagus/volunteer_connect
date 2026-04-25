@@ -6,7 +6,16 @@ require_once '../db_connect.php';
 require_once '../includes/auth.php';
 require_role('admin');
 
-$eventId = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: dashboard.php');
+    exit();
+}
+
+if (isset($_POST['id'])) {
+    $eventId = (int)$_POST['id'];
+} else {
+    $eventId = 0;
+}
 
 if ($eventId <= 0) {
     header('Location: dashboard.php');
