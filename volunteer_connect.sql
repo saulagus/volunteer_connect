@@ -51,3 +51,13 @@ CREATE TABLE IF NOT EXISTS bookings (
     FOREIGN KEY (userId)  REFERENCES users(userId),
     FOREIGN KEY (eventId) REFERENCES events(eventId) ON DELETE RESTRICT
 );
+
+-- Insert default data
+INSERT IGNORE INTO categories (name, description) VALUES 
+('Environmental', 'Events focused on nature and conservation.'),
+('Education', 'Tutoring and school-related support.'),
+('Animal Welfare', 'Helping at shelters and wildlife.'),
+('Community Outreach', 'Food drives and local support.'),
+('Health & Wellness', 'Hospitals and awareness.'),
+('Disaster Relief', 'Emergency response.'),
+('Other', 'Miscellaneous events.');
