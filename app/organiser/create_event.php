@@ -6,40 +6,69 @@ $error_msg = "";
 
 // Run when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_event'])) {
-    // Collect data from form
-    $title = $_POST['title'];
-    $description = $_POST['description'];
-    $location = $_POST['location'];
+    // Collect data from form and Sanitise 
+    $title = strip_tags($_POST['title']);
+    $description = strip_tags($_POST['description']);
+    $location = strip_tags($_POST['location']);
     $eventDate = $_POST['eventDate'];
     $capacity = $_POST['capacity'];
     $categoryId = $_POST['categoryId'];
     // Linking the event to the logged-in user (organiserId)
     $organiserId = $_SESSION['user_id']; 
 
-    // Prepared Statements
-    $sql = "INSERT INTO events (title, description, location, eventDate, capacity, categoryId, organiserId) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssssiii", $title, $description, $location, $eventDate, $capacity, $categoryId, $organiserId);
+    // Server-Side Validation
+    $errors = [];
 
-    if ($stmt->execute()) {
-        // Close statement here
-        $stmt->close(); 
-        // Close connection before leaving
-        $conn->close(); 
-        // If successful, go back to dashboard
-        header("Location: dashboard.php?msg=created");
-        // Always exit after a redirect
-        exit();
-    } else {
-        $error_msg = "Database error: " . $stmt->error;
+    // Text Fields Validation
+    if (empty($title) || empty($description) || empty($location)) {
+        $errors[] = "All text fields are required.";
     }
 
-    $stmt->close();
-    
+    // Capacity Validation
+    if (!is_numeric($capacity) || $capacity <= 0) {
+        $errors[] = "Capacity must be a positive number.";
+    }
+
+    // Date Validation
+    $currentDate = date('Y-m-d H:i');
+    if (strtotime($eventDate) < strtotime($currentDate)) {
+        $errors[] = "Event date cannot be in the past.";
+    }
+
+    if (empty($categoryId)) {
+        $errors[] = "Please select a valid category.";
+    }
+
+    // Check if we can proceed
+    if (empty($errors)) {
+        // If no errors, then proceed to Database
+        // Prepared Statements
+        $sql = "INSERT INTO events (title, description, location, eventDate, capacity, categoryId, organiserId) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ssssiii", $title, $description, $location, $eventDate, $capacity, $categoryId, $organiserId);
+
+        if ($stmt->execute()) {
+            // Close statement here
+            $stmt->close(); 
+            // Close connection before leaving
+            $conn->close(); 
+            // If successful, go back to dashboard
+            header("Location: dashboard.php?msg=created");
+            // Always exit after a redirect
+            exit();
+        } else {
+            $error_msg = "Database error: " . $stmt->error;
+        }
+
+        $stmt->close();
+    } else {
+        // If validation failed, then show all error messages
+        $error_msg = implode("<br>", $errors);
+    }
 }
 
-// Fetch data for the form
+// Fetch categories to populate the dropdown
 $cat_sql = "SELECT * FROM categories";
 $cat_result = $conn->query($cat_sql);
 

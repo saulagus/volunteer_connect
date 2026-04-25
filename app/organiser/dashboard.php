@@ -23,6 +23,10 @@ $result = $stmt->get_result();
     <h1>Welcome, <?php echo $_SESSION['user_name']; ?>!</h1>
     <p>Role: Organiser</p>
 
+    <?php if (isset($_GET['error']) && $_GET['error'] == 'notfound'): ?>
+    <p style="color: red;">Security Alert: Event not found or access denied.</p>
+    <?php endif; ?>
+
     <a href="create_event.php" style="button"> + Create New Event</a>
 
     <h2>My Volunteering Events</h2>
