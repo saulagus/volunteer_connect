@@ -2,7 +2,7 @@
 // shows site counts and links to management pages
 
 session_start();
-require_once '../includes/db.php';
+require_once '../db_connect.php';
 require_once '../includes/auth.php';
 require_role('admin');
 // get total of registered users

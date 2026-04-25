@@ -2,7 +2,7 @@
 // deletes a user by id on post, only redirects, no HTML
 
 session_start();
-require_once '../includes/db.php';
+require_once '../db_connect.php';
 require_once '../includes/auth.php';
 require_role('admin');
 // reject anything that isn't a POST request
@@ -29,7 +29,7 @@ if ($id === (int)$_SESSION['user_id']) {
 }
 
 // delete the user - bookings and events cascade automatically
-$stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
+$stmt = $conn->prepare("DELETE FROM users WHERE userId = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $stmt->close();

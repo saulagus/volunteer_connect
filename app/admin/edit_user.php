@@ -2,7 +2,7 @@
 // file for admin to edit a user's name, email, and role
 
 session_start();
-require_once '../includes/db.php';
+require_once '../db_connect.php';
 require_once '../includes/auth.php';
 require_role('admin');
 
