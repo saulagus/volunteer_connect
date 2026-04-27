@@ -21,36 +21,58 @@ while ($row !== null) {
 }
 ?>
 <?php require_once '../includes/header.php'; ?>
+
 <main>
     <h1>All Users</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Registered</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($users as $user): ?>
-            <tr>
-                <td><?= htmlspecialchars($user['name']) ?></td>
-                <td><?= htmlspecialchars($user['email']) ?></td>
-                <td><?= htmlspecialchars($user['role']) ?></td>
-                <td><?= htmlspecialchars($user['createdAt']) ?></td>
-                <td>
-                    <a href="edit_user.php?id=<?= (int)$user['userId'] ?>">Edit</a>
-                    <form method="POST" action="delete_user.php">
-                        <input type="hidden" name="id" value="<?= (int)$user['userId'] ?>">
-                        <button type="submit">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+
+    <div class="tableWrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Registered</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (empty($users)): ?>
+                    <tr>
+                        <td colspan="5" class="emptyState">No users found.</td>
+                    </tr>
+                <?php endif; ?>
+                <?php foreach ($users as $user): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($user['name']) ?></td>
+                        <td><?= htmlspecialchars($user['email']) ?></td>
+                        <td>
+                            <?php
+                            if ($user['role'] === 'admin') {
+                                $roleClass = 'roleAdmin';
+                            } elseif ($user['role'] === 'organiser') {
+                                $roleClass = 'roleOrganiser';
+                            } else {
+                                $roleClass = 'roleAttendee';
+                            }
+                            ?>
+                            <span class="roleBadge <?= $roleClass ?>"><?= htmlspecialchars($user['role']) ?></span>
+                        </td>
+                        <td><?= htmlspecialchars(date('d M Y', strtotime($user['createdAt']))) ?></td>
+                        <td>
+                            <div class="tableActions">
+                                <a href="edit_user.php?id=<?= (int)$user['userId'] ?>" class="btn btnSecondary">Edit</a>
+                                <form method="POST" action="delete_user.php" class="inlineForm">
+                                    <input type="hidden" name="id" value="<?= (int)$user['userId'] ?>">
+                                    <button type="submit" class="btn btnDanger">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 </main>
 
 <?php require_once '../includes/footer.php'; ?>

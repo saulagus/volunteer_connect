@@ -152,54 +152,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <main>
     <h1>Edit Event</h1>
 
-    <?php if (!empty($errors)): ?>
-        <ul class="formErrors">
-            <?php foreach ($errors as $error): ?>
-                <li><?= htmlspecialchars($error) ?></li>
-            <?php endforeach; ?>
-        </ul>
-    <?php endif; ?>
+    <div class="formWrap">
+        <?php if (!empty($errors)): ?>
+            <ul class="formErrors">
+                <?php foreach ($errors as $error): ?>
+                    <li><?= htmlspecialchars($error) ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
 
-    <form method="POST" action="edit_event.php">
-        <input type="hidden" name="id" value="<?= (int)$event['eventId'] ?>">
+        <form method="POST" action="edit_event.php">
+            <input type="hidden" name="id" value="<?= (int)$event['eventId'] ?>">
 
-        <label for="title">Title</label>
-        <input type="text" id="title" name="title" value="<?= htmlspecialchars($title) ?>">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" value="<?= htmlspecialchars($title) ?>">
 
-        <label for="description">Description</label>
-        <textarea id="description" name="description"><?= htmlspecialchars($description ?? '') ?></textarea>
+            <label for="description">Description</label>
+            <textarea id="description" name="description"><?= htmlspecialchars($description ?? '') ?></textarea>
 
-        <label for="location">Location</label>
-        <input type="text" id="location" name="location" value="<?= htmlspecialchars($location ?? '') ?>">
+            <label for="location">Location</label>
+            <input type="text" id="location" name="location" value="<?= htmlspecialchars($location ?? '') ?>">
 
-        <label for="eventDate">Date and Time</label>
-        <input type="datetime-local" id="eventDate" name="eventDate" value="<?= htmlspecialchars($eventDate) ?>">
+            <label for="eventDate">Date and Time</label>
+            <input type="datetime-local" id="eventDate" name="eventDate" value="<?= htmlspecialchars($eventDate) ?>">
 
-        <label for="capacity">Capacity</label>
-        <input type="number" id="capacity" name="capacity" min="1" value="<?= (int)$capacity ?>">
+            <label for="capacity">Capacity</label>
+            <input type="number" id="capacity" name="capacity" min="1" value="<?= (int)$capacity ?>">
 
-        <label for="categoryId">Category</label>
-        <select id="categoryId" name="categoryId">
-            <option value="0">-- None --</option>
-            <?php foreach ($categories as $cat): ?>
-                <option value="<?= (int)$cat['categoryId'] ?>"
-                    <?php if ((int)$cat['categoryId'] === (int)$categoryId) echo 'selected'; ?>>
-                    <?= htmlspecialchars($cat['name']) ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
+            <label for="categoryId">Category</label>
+            <select id="categoryId" name="categoryId">
+                <option value="0">-- None --</option>
+                <?php foreach ($categories as $cat): ?>
+                    <option value="<?= (int)$cat['categoryId'] ?>"
+                        <?php if ((int)$cat['categoryId'] === (int)$categoryId) echo 'selected'; ?>>
+                        <?= htmlspecialchars($cat['name']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
 
-        <label for="status">Status</label>
-        <select id="status" name="status">
-            <option value="active"    <?php if ($status === 'active')    echo 'selected'; ?>>Active</option>
-            <option value="full"      <?php if ($status === 'full')      echo 'selected'; ?>>Full</option>
-            <option value="completed" <?php if ($status === 'completed') echo 'selected'; ?>>Completed</option>
-            <option value="cancelled" <?php if ($status === 'cancelled') echo 'selected'; ?>>Cancelled</option>
-        </select>
+            <label for="status">Status</label>
+            <select id="status" name="status">
+                <option value="active"    <?php if ($status === 'active')    echo 'selected'; ?>>Active</option>
+                <option value="full"      <?php if ($status === 'full')      echo 'selected'; ?>>Full</option>
+                <option value="completed" <?php if ($status === 'completed') echo 'selected'; ?>>Completed</option>
+                <option value="cancelled" <?php if ($status === 'cancelled') echo 'selected'; ?>>Cancelled</option>
+            </select>
 
-        <button type="submit">Save Changes</button>
-        <a href="dashboard.php">Cancel</a>
-    </form>
+            <div class="formActions">
+                <button type="submit" class="btn btnPrimary">Save Changes</button>
+                <a href="dashboard.php" class="btn btnSecondary">Cancel</a>
+            </div>
+        </form>
+    </div>
 </main>
 
 <?php require_once '../includes/footer.php'; ?>

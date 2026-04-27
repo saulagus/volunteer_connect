@@ -130,30 +130,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <main>
     <h1>Edit User</h1>
-    <!-- show any validation errors if they exist -->
-    <?php if (!empty($errors)): ?>
-        <ul class="formErrors">
-            <?php foreach ($errors as $error): ?>
-                <li><?= htmlspecialchars($error) ?></li>
-            <?php endforeach; ?>
-        </ul>
-    <?php endif; ?>
-    <form method="POST" action="edit_user.php">
-        <input type="hidden" name="id" value="<?= (int)$user['userId'] ?>">
-        <label for="name">Name</label>
-        <input type="text" id="name" name="name" value="<?= htmlspecialchars($name) ?>">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" value="<?= htmlspecialchars($email) ?>">
-        <label for="role">Role</label>
-        <select id="role" name="role">
-            <option value="admin"     <?php if ($role === 'admin')     echo 'selected'; ?>>Admin</option>
-            <option value="organiser" <?php if ($role === 'organiser') echo 'selected'; ?>>Organiser</option>
-            <option value="attendee"  <?php if ($role === 'attendee')  echo 'selected'; ?>>Attendee</option>
-        </select>
 
-        <button type="submit">Save Changes</button>
-        <a href="users.php">Cancel</a>
-    </form>
+    <div class="formWrap">
+        <!-- show any validation errors if they exist -->
+        <?php if (!empty($errors)): ?>
+            <ul class="formErrors">
+                <?php foreach ($errors as $error): ?>
+                    <li><?= htmlspecialchars($error) ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+
+        <form method="POST" action="edit_user.php">
+            <input type="hidden" name="id" value="<?= (int)$user['userId'] ?>">
+
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" value="<?= htmlspecialchars($name) ?>">
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="<?= htmlspecialchars($email) ?>">
+
+            <label for="role">Role</label>
+            <select id="role" name="role">
+                <option value="admin"     <?php if ($role === 'admin')     echo 'selected'; ?>>Admin</option>
+                <option value="organiser" <?php if ($role === 'organiser') echo 'selected'; ?>>Organiser</option>
+                <option value="attendee"  <?php if ($role === 'attendee')  echo 'selected'; ?>>Attendee</option>
+            </select>
+
+            <div class="formActions">
+                <button type="submit" class="btn btnPrimary">Save Changes</button>
+                <a href="users.php" class="btn btnSecondary">Cancel</a>
+            </div>
+        </form>
+    </div>
 </main>
 
 <?php require_once '../includes/footer.php'; ?>
