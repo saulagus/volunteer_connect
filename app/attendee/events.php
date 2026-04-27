@@ -2,7 +2,7 @@
 // shows all active events attendees can browse and sign up for
 
 session_start();
-require_once '../includes/db.php';
+require_once '../db_connect.php';
 require_once '../includes/auth.php';
 require_role('attendee');
 // only show events that are still open and haven't already happened, soonest first

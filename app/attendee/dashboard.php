@@ -2,7 +2,7 @@
 // landing page for attendees, shows their booking summary and links to browse/manage
 
 session_start();
-require_once '../includes/db.php';
+require_once '../db_connect.php';
 require_once '../includes/auth.php';
 require_role('attendee');
 
