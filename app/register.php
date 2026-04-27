@@ -2,7 +2,7 @@
 // file for new users to sign up as an attendee or organiser, stores a hashed password
 
 session_start();
-require_once 'includes/db.php';
+require_once 'db_connect.php';
 require_once 'includes/auth.php';
 
 // if already signed in, no need to register again
@@ -115,37 +115,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php require_once 'includes/header.php'; ?>
 
 <main>
-    <h1>Register</h1>
-    <!-- show any validation errors if they exist -->
-    <?php if (!empty($errors)): ?>
-        <ul class="formErrors">
-            <?php foreach ($errors as $error): ?>
-                <li><?= htmlspecialchars($error) ?></li>
-            <?php endforeach; ?>
-        </ul>
-    <?php endif; ?>
-    <form method="POST" action="register.php">
-        <label for="name">Name</label>
-        <input type="text" id="name" name="name" value="<?= htmlspecialchars($name) ?>">
+    <div class="authCard">
+        <h1>Register</h1>
 
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" value="<?= htmlspecialchars($email) ?>">
+        <!-- show any validation errors if they exist -->
+        <?php if (!empty($errors)): ?>
+            <ul class="formErrors">
+                <?php foreach ($errors as $error): ?>
+                    <li><?= htmlspecialchars($error) ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
 
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password">
+        <form method="POST" action="register.php">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" value="<?= htmlspecialchars($name) ?>">
 
-        <label for="confirm_password">Confirm Password</label>
-        <input type="password" id="confirm_password" name="confirm_password">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="<?= htmlspecialchars($email) ?>">
 
-        <label for="role">Register as</label>
-        <select id="role" name="role">
-            <option value="attendee"  <?php if ($role === 'attendee')  echo 'selected'; ?>>Attendee</option>
-            <option value="organiser" <?php if ($role === 'organiser') echo 'selected'; ?>>Organiser</option>
-        </select>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password">
 
-        <button type="submit">Create Account</button>
-        <a href="login.php">Already have an account? Log in</a>
-    </form>
+            <label for="confirm_password">Confirm Password</label>
+            <input type="password" id="confirm_password" name="confirm_password">
+
+            <label for="role">Register as</label>
+            <select id="role" name="role">
+                <option value="attendee"  <?php if ($role === 'attendee')  echo 'selected'; ?>>Attendee</option>
+                <option value="organiser" <?php if ($role === 'organiser') echo 'selected'; ?>>Organiser</option>
+            </select>
+
+            <div class="formActions">
+                <button type="submit" class="btn btnPrimary">Create Account</button>
+            </div>
+        </form>
+
+        <p class="authFooter">
+            Already have an account? <a href="/login.php">Log in</a>
+        </p>
+    </div>
 </main>
 
 <?php require_once 'includes/footer.php'; ?>
