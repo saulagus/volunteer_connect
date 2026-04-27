@@ -105,7 +105,7 @@ $stmt->close();
 
 if (!$event) {
     require_once '../includes/header.php';
-    echo '<main><h1>Event not found</h1><p><a href="events.php">Back to events</a></p></main>';
+    echo '<main><h1>Event not found</h1><p><a href="events.php" class="btn btnSecondary">Back to events</a></p></main>';
     require_once '../includes/footer.php';
     exit();
 }
@@ -135,52 +135,75 @@ $myStatus = $myBookingRow ? $myBookingRow['status'] : null;
 
 $isPast   = strtotime($event['eventDate']) < time();
 $isActive = $event['status'] === 'active';
+
+// pick a badge class for the event status, matches admin convention
+if ($event['status'] === 'active') {
+    $badgeClass = 'statusActive';
+} elseif ($event['status'] === 'full') {
+    $badgeClass = 'statusFull';
+} elseif ($event['status'] === 'cancelled') {
+    $badgeClass = 'statusCancelled';
+} else {
+    $badgeClass = 'statusCompleted';
+}
 ?>
 <?php require_once '../includes/header.php'; ?>
+
 <main>
     <h1><?= htmlspecialchars($event['title']) ?></h1>
 
+    <!-- booking feedback messages -->
     <?php if ($message !== ''): ?>
-        <p class="success"><?= htmlspecialchars($message) ?></p>
+        <p class="formSuccess"><?= htmlspecialchars($message) ?></p>
     <?php endif; ?>
     <?php if ($error !== ''): ?>
-        <p class="error"><?= htmlspecialchars($error) ?></p>
+        <ul class="formErrors">
+            <li><?= htmlspecialchars($error) ?></li>
+        </ul>
     <?php endif; ?>
 
-    <dl>
-        <dt>Category</dt>
-        <dd><?= htmlspecialchars($event['categoryName'] ?? '-') ?></dd>
+    <!-- event details -->
+    <div class="detailWrap">
+        <dl>
+            <dt>Status</dt>
+            <dd><span class="statusBadge <?= $badgeClass ?>"><?= htmlspecialchars($event['status']) ?></span></dd>
 
-        <dt>Organiser</dt>
-        <dd><?= htmlspecialchars($event['organiserName']) ?></dd>
+            <dt>Category</dt>
+            <dd><?= htmlspecialchars($event['categoryName'] ?? '-') ?></dd>
 
-        <dt>Location</dt>
-        <dd><?= htmlspecialchars($event['location']) ?></dd>
+            <dt>Organiser</dt>
+            <dd><?= htmlspecialchars($event['organiserName']) ?></dd>
 
-        <dt>Date</dt>
-        <dd><?= htmlspecialchars($event['eventDate']) ?></dd>
+            <dt>Location</dt>
+            <dd><?= htmlspecialchars($event['location']) ?></dd>
 
-        <dt>Places left</dt>
-        <dd><?= (int)max(0, $remaining) ?> of <?= (int)$event['capacity'] ?></dd>
+            <dt>Date</dt>
+            <dd><?= htmlspecialchars(date('d M Y, H:i', strtotime($event['eventDate']))) ?></dd>
 
-        <dt>Description</dt>
-        <dd><?= nl2br(htmlspecialchars($event['description'] ?? '')) ?></dd>
-    </dl>
+            <dt>Places Left</dt>
+            <dd><?= max(0, $remaining) ?> of <?= (int)$event['capacity'] ?></dd>
 
-    <?php if ($myStatus === 'booked'): ?>
-        <p>You're booked on this event.</p>
-        <a href="my_bookings.php">View my bookings</a>
-    <?php elseif (!$isActive || $isPast): ?>
-        <p>Bookings are closed for this event.</p>
-    <?php elseif ($remaining <= 0): ?>
-        <p>This event is full.</p>
-    <?php else: ?>
-        <form method="POST" action="event_detail.php?id=<?= (int)$event['eventId'] ?>">
-            <button type="submit" name="book_btn">Book a place</button>
-        </form>
-    <?php endif; ?>
+            <dt>Description</dt>
+            <dd><?= nl2br(htmlspecialchars($event['description'] ?? '')) ?></dd>
+        </dl>
+    </div>
 
-    <p><a href="events.php">Back to events</a></p>
+    <!-- booking action -->
+    <div class="formActions">
+        <?php if ($myStatus === 'booked'): ?>
+            <p>You're booked on this event.</p>
+            <a href="my_bookings.php" class="btn btnSecondary">View My Bookings</a>
+        <?php elseif (!$isActive || $isPast): ?>
+            <p>Bookings are closed for this event.</p>
+        <?php elseif ($remaining <= 0): ?>
+            <p>This event is full.</p>
+        <?php else: ?>
+            <form method="POST" action="event_detail.php?id=<?= (int)$event['eventId'] ?>" class="inlineForm">
+                <button type="submit" name="book_btn" class="btn btnPrimary">Book a Place</button>
+            </form>
+        <?php endif; ?>
+        <a href="events.php" class="btn btnSecondary">Back to Events</a>
+    </div>
 </main>
 
 <?php require_once '../includes/footer.php'; ?>
