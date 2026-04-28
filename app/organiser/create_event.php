@@ -1,6 +1,9 @@
-<?php
-include 'organiser_check.php';
-require_once '../db_connect.php';
+<?php 
+// Session-check
+include 'organiser_check.php'; 
+require_once '../db.php'; 
+require_once '../includes/auth.php';
+require_role('organiser');
 
 $error_msg = "";
 
@@ -11,10 +14,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_event'])) {
     $description = strip_tags($_POST['description']);
     $location = strip_tags($_POST['location']);
     $eventDate = $_POST['eventDate'];
-    $capacity = $_POST['capacity'];
-    $categoryId = $_POST['categoryId'];
+    $capacity = (int)$_POST['capacity'];
+    $categoryId = (int)$_POST['categoryId'];
     // Linking the event to the logged-in user (organiserId)
-    $organiserId = $_SESSION['user_id']; 
+    $organiserId = (int)$_SESSION['user_id']; 
 
     // Server-Side Validation
     $errors = [];
@@ -58,10 +61,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_event'])) {
             // Always exit after a redirect
             exit();
         } else {
-            $error_msg = "Database error: " . $stmt->error;
+            $error_msg = "Database error: " . htmlspecialchars($stmt->error);
+            $stmt->close(); // Close if execute fails
         }
-
-        $stmt->close();
     } else {
         // If validation failed, then show all error messages
         $error_msg = implode("<br>", $errors);
@@ -69,10 +71,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_event'])) {
 }
 
 // Fetch categories to populate the dropdown
-$cat_sql = "SELECT * FROM categories";
+$cat_sql = "SELECT categoryId, name FROM categories";
 $cat_result = $conn->query($cat_sql);
 
 ?>
+<?php require_once '../includes/header.php'; ?>
+
 
 <!DOCTYPE html>
 <html>
@@ -84,7 +88,7 @@ $cat_result = $conn->query($cat_sql);
     <a href="dashboard.php">Back to Dashboard</a>
 
     <?php if ($error_msg): ?>
-        <p style="color: red;"><?php echo $error_msg; ?></p>
+        <p style="color: red;"><?php echo htmlspecialchars($error_msg); ?></p>
     <?php endif; ?>
 
     <form action="" method="POST">
@@ -107,8 +111,8 @@ $cat_result = $conn->query($cat_sql);
         <select name="categoryId" required>
             <option value="">-- Select Category --</option>
             <?php while($cat = $cat_result->fetch_assoc()): ?>
-                <option value="<?php echo $cat['categoryId']; ?>">
-                    <?php echo $cat['name']; ?>
+                <option value="<?php echo (int)$cat['categoryId']; ?>">
+                    <?php echo htmlspecialchars($cat['name']); ?>
                 </option>
             <?php endwhile; ?>
         </select><br><br>
@@ -117,3 +121,5 @@ $cat_result = $conn->query($cat_sql);
     </form>
 </body>
 </html>
+
+<?php require_once '../includes/footer.php'; ?>

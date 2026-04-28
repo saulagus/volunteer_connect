@@ -1,15 +1,18 @@
 <?php 
+// Session-check
 include 'organiser_check.php'; 
-require_once '../db_connect.php'; 
+require_once '../db.php'; 
+require_once '../includes/auth.php';
+require_role('organiser');
 
-$organiserId = $_SESSION['user_id'];
+$organiserId = (int)$_SESSION['user_id'];
 
 // Check if the Event ID is provided
 if (!isset($_GET['id'])) {
     header("Location: dashboard.php");
     exit();
 }
-$eventId = $_GET['id'];
+$eventId = (int)$_GET['id'];
 
 // Security Check to ensure event actually belong to this organiser
 $check_sql = "SELECT title FROM events WHERE eventId = ? AND organiserId = ?";
@@ -17,11 +20,11 @@ $check_stmt = $conn->prepare($check_sql);
 $check_stmt->bind_param("ii", $eventId, $organiserId);
 $check_stmt->execute();
 $event_result = $check_stmt->get_result();
+$event_data = $event_result->fetch_assoc(); 
 
-if ($event_result->num_rows === 0) {
+if (!$event_data) {
     die("Error: Event not found or you do not have permission to view it.");
 }
-$event_data = $event_result->fetch_assoc();
 
 // Fetch Attendees using JOIN
 // We join 'bookings' with 'users' to get the volunteer details
@@ -36,6 +39,8 @@ $stmt->bind_param("i", $eventId);
 $stmt->execute();
 $attendees = $stmt->get_result();
 ?>
+
+<?php require_once '../includes/header.php'; ?>
 
 <!DOCTYPE html>
 <html>
@@ -63,8 +68,8 @@ $attendees = $stmt->get_result();
                 <tr>
                     <td><?php echo htmlspecialchars($row['name']); ?></td>
                     <td><?php echo htmlspecialchars($row['email']); ?></td>
-                    <td><?php echo $row['bookingDate']; ?></td>
-                    <td><?php echo $row['status']; ?></td>
+                    <td><?php echo htmlspecialchars($row['bookingDate']); ?></td>
+                    <td><?php echo htmlspecialchars($row['status']); ?></td>
                 </tr>
                 <?php endwhile; ?>
             </tbody>
@@ -81,3 +86,5 @@ $stmt->close();
 $check_stmt->close();
 $conn->close(); 
 ?>
+
+<?php require_once '../includes/footer.php'; ?>

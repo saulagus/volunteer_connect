@@ -1,10 +1,16 @@
-<?php
-include 'organiser_check.php';
-require_once '../db_connect.php';
+<?php 
+// Session-check
+include 'organiser_check.php'; 
+require_once '../db.php'; 
+require_once '../includes/auth.php';
+require_role('organiser');
 
-if (isset($_GET['id'])) {
-    $eventId = $_GET['id'];
-    $organiserId = $_SESSION['user_id'];
+// Check if the request is a POST and the ID exists
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
+    
+    //Cast to int for safety
+    $eventId = (int)$_POST['id'];
+    $organiserId = (int)$_SESSION['user_id'];
 
     // We check organiserId to make sure they own the event they are trying to cancel!
     $sql = "UPDATE events SET status = 'cancelled' WHERE eventId = ? AND organiserId = ?";
@@ -12,9 +18,18 @@ if (isset($_GET['id'])) {
     $stmt->bind_param("ii", $eventId, $organiserId);
     
     if ($stmt->execute()) {
+        $stmt->close();
+        $conn->close();
+        // Redirect with exit()
         header("Location: dashboard.php?msg=cancelled");
+        exit(); 
     } else {
         echo "Error cancelling event.";
     }
+    $stmt->close();
+} else {
+    // Fallback redirect if someone tries to access this page directly without a POST ID
+    header("Location: dashboard.php");
+    exit();
 }
 ?>

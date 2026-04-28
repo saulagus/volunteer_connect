@@ -1,17 +1,20 @@
 <?php 
+// Session-check
 include 'organiser_check.php'; 
-require_once '../db_connect.php'; 
+require_once '../db.php'; 
+require_once '../includes/auth.php';
+require_role('organiser');
 
 $organiserId = $_SESSION['user_id'];
 $error_msg = "";
 $success_msg = "";
 
 // Validate first if the ID exist in the URL
-if (!isset($_GET['id'])) {
+if (!isset$_GET['id'])) {
     header("Location: dashboard.php");
     exit();
 }
-$eventId = $_GET['id'];
+$eventId = ((int)$_GET['id'];
 
 // Run if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_event'])) {
@@ -20,8 +23,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_event'])) {
     $description = strip_tags($_POST['description']);
     $location = strip_tags($_POST['location']);
     $eventDate = $_POST['eventDate'];
-    $capacity = $_POST['capacity'];
-    $categoryId = $_POST['categoryId'];
+    $capacity = (int)$_POST['capacity'];
+    $categoryId = (int)$_POST['categoryId'];
     $status = $_POST['status'];
 
     // Server-Side Validation
@@ -60,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_event'])) {
         if ($stmt->execute()) {
             $success_msg = "Event updated successfully!";
         } else {
-            $error_msg = "Error updating event: " . $stmt->error;
+            $error_msg = "Error updating event: " . htmlspecialchars($stmt->error);
         }
         $stmt->close();
     } else {
@@ -74,17 +77,21 @@ $fetch_sql = "SELECT * FROM events WHERE eventId = ? AND organiserId = ?";
 $fetch_stmt = $conn->prepare($fetch_sql);
 $fetch_stmt->bind_param("ii", $eventId, $organiserId);
 $fetch_stmt->execute();
-$event = $fetch_stmt->get_result()->fetch_assoc();
+$result = $fetch_stmt->get_result(); // Get the result object
+$event = $result->fetch_assoc(); //Fetch the associative array
 
 if (!$event) {
+    $fetch_stmt->close();
     // If no event found, or unauthorised ID show error
     header("Location: dashboard.php?error=notfound");
     exit();
 }
 
 // Also fetch categories for the dropdown
-$cat_result = $conn->query("SELECT * FROM categories");
+$cat_result = $conn->query("SELECT categoryId, name FROM categories");
 ?>
+
+<?php require_once '../includes/header.php'; ?>
 
 <!DOCTYPE html>
 <html>
@@ -96,11 +103,11 @@ $cat_result = $conn->query("SELECT * FROM categories");
     <a href="dashboard.php">Back to Dashboard</a>
 
     <?php if ($success_msg): ?>
-        <p style="color: green;"><?php echo $success_msg; ?></p>
+        <p style="color: green;"><?php echo htmlspecialchars($success_msg); ?></p>
     <?php endif; ?>
     
     <?php if ($error_msg): ?>
-        <p style="color: red;"><?php echo $error_msg; ?></p>
+        <p style="color: red;"><?php echo htmlspecialchars($error_msg); ?></p>
     <?php endif; ?>
 
     <form action="edit_event.php?id=<?php echo $eventId; ?>" method="POST">
@@ -122,8 +129,8 @@ $cat_result = $conn->query("SELECT * FROM categories");
         <label>Category:</label><br>
         <select name="categoryId" required>
             <?php while($cat = $cat_result->fetch_assoc()): ?>
-                <option value="<?php echo $cat['categoryId']; ?>" <?php echo ($cat['categoryId'] == $event['categoryId']) ? 'selected' : ''; ?>>
-                    <?php echo $cat['name']; ?>
+                <option value="<?php echo htmlspecialchars($cat['categoryId']); ?>" <?php echo ($cat['categoryId'] == $event['categoryId']) ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($cat['name']); ?>
                 </option>
             <?php endwhile; ?>
         </select><br><br>
@@ -145,3 +152,5 @@ $cat_result = $conn->query("SELECT * FROM categories");
 $fetch_stmt->close();
 $conn->close(); 
 ?>
+
+<?php require_once '../includes/footer.php'; ?>
