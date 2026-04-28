@@ -1,7 +1,7 @@
 <?php
 session_start();
-// Database connection
-require_once 'db_connect.php'; 
+require_once 'db_connect.php';
+require_once 'includes/auth.php';
 
 // Initialize error as empty
 $error = ""; 
@@ -64,33 +64,42 @@ if (isset($_POST['login_btn'])) {
 }
 
 ?>
+<?php require_once 'includes/header.php'; ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login - Volunteer Connect</title>
-</head>
-<body>
-    <h2>Login to Manage Events</h2>
+<main>
+    <div class="authCard">
+        <h1>Log In</h1>
 
-    <?php if ($error !== ""): ?>
-        <p style="color: red;"><?php echo $error; ?></p>
-    <?php endif; ?>
+        <!-- show login errors -->
+        <?php if ($error !== ""): ?>
+            <ul class="formErrors">
+                <li><?= htmlspecialchars($error) ?></li>
+            </ul>
+        <?php endif; ?>
 
-    <?php if (isset($_GET['error']) && $_GET['error'] == 'unauthorized'): ?>
-        <p style="color: red;">Please login to access that page.</p>
-    <?php endif; ?>
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'unauthorized'): ?>
+            <ul class="formErrors">
+                <li>Please log in to access that page.</li>
+            </ul>
+        <?php endif; ?>
 
-    <form action="login.php" method="POST">
-        <label>Email:</label><br>
-        <input type="email" name="email" required><br><br>
-        
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
-        
-        <button type="submit" name="login_btn">Login</button>
-    </form>
-</body>
-</html>
+        <form action="login.php" method="POST">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
 
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+
+            <div class="formActions">
+                <button type="submit" name="login_btn" class="btn btnPrimary">Log In</button>
+            </div>
+        </form>
+
+        <p class="authFooter">
+            Don't have an account? <a href="/register.php">Register here</a>
+        </p>
+    </div>
+</main>
+
+<?php require_once 'includes/footer.php'; ?>
 <?php $conn->close(); ?>

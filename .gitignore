@@ -1,0 +1,13 @@
+# Database credentials
+app/includes/db.php
+app/db_connect.php
+
+# Environment files
+.env
+*.env
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
