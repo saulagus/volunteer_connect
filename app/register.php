@@ -7,7 +7,7 @@ require_once 'includes/auth.php';
 
 // if already signed in, no need to register again
 if (is_logged_in()) {
-    header('Location: /index.php');
+    header('Location: /volunteer_connect/app/index.php');
     exit();
 }
 
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // check that the email isn't already registered
     if (empty($errors)) {
         $stmt = $conn->prepare(
-            "SELECT id FROM users
+            "SELECT userId FROM users
             WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
 
         $_SESSION['flash'] = 'Account created. Please log in.';
-        header('Location: /login.php');
+        header('Location: /volunteer_connect/app/login.php');
         exit();
     }
 }
@@ -152,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
 
         <p class="authFooter">
-            Already have an account? <a href="/login.php">Log in</a>
+            Already have an account? <a href="/volunteer_connect/app/login.php">Log in</a>
         </p>
     </div>
 </main>

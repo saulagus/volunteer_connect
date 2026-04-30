@@ -11,6 +11,11 @@ require_once 'includes/header.php';
 ?>
 
 <main>
+    <!-- Logout confirmation -->
+    <?php if (isset($_GET['msg']) && $_GET['msg'] === 'logged_out'): ?>
+        <div class="flashSuccess">You have been successfully logged out. See you soon!</div>
+    <?php endif; ?>
+
     <!-- HERO SECTION -->
     <section style="text-align: center; padding: var(--space-7) 0; border-bottom: 1px solid var(--line);">
         <h1 style="font-size: var(--text-3xl); margin-bottom: var(--space-4);">Small acts, big impact.</h1>
@@ -24,10 +29,18 @@ require_once 'includes/header.php';
                 <!-- If logged in, show 'Go to Dashboard' instead of Login -->
                 <?php 
                     $role = current_role();
-                    $dashLink = ($role === 'organiser') ? 'organiser/dashboard.php' : 'attendee/events.php';
+
+                    // Handle all three roles 
+                    if ($role === 'admin') {
+                        $dashLink = "/volunteer_connect/app/admin/dashboard.php";
+                    } elseif ($role === 'organiser') {
+                        $dashLink = "/volunteer_connect/app/organiser/dashboard.php";
+                    } else {
+                        $dashLink = "/volunteer_connect/app/attendee/events.php";
+                    }
                 ?>
                 <a href="<?= $dashLink ?>" class="btn btnPrimary">Go to My Dashboard</a>
-                <a href="logout.php" class="btn btnSecondary">Log Out</a>
+                <a href="<?= $base ?>logout.php" class="btn btnSecondary">Log Out</a>
             <?php else: ?>
                 <!-- If not logged in, show standard CTAs -->
                 <a href="register.php" class="btn btnPrimary">Start Volunteering</a>

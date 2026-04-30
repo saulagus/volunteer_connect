@@ -19,27 +19,27 @@ if (isset($pageTitle)) {
 <body>
 
 <nav class="navBar">
-    <a href="/index.php" class="siteName">Volunteer Connect</a>
+    <a href="/volunteer_connect/app/index.php" class="siteName">Volunteer Connect</a>
 
     <ul class="navLinks">
         <?php if (!is_logged_in()): ?>
-            <li><a href="/login.php">Login</a></li>
-            <li><a href="/register.php">Register</a></li>
+            <li><a href="/volunteer_connect/app/login.php">Login</a></li>
+            <li><a href="/volunteer_connect/app/register.php">Register</a></li>
 
         <?php elseif (current_role() === 'admin'): ?>
-            <li><a href="/admin/dashboard.php">Dashboard</a></li>
-            <li><a href="/admin/users.php">Users</a></li>
-            <li><a href="/logout.php">Logout</a></li>
+            <li><a href="/volunteer_connect/app/admin/dashboard.php">Dashboard</a></li>
+            <li><a href="/volunteer_connect/app/admin/users.php">Users</a></li>
+            <li><a href="/volunteer_connect/app/logout.php">Logout</a></li>
 
         <?php elseif (current_role() === 'organiser'): ?>
-            <li><a href="/organiser/dashboard.php">My Events</a></li>
-            <li><a href="/organiser/create_event.php">Create Event</a></li>
-            <li><a href="/logout.php">Logout</a></li>
+            <li><a href="/volunteer_connect/app/organiser/dashboard.php">My Events</a></li>
+            <li><a href="/volunteer_connect/app/organiser/create_event.php">Create Event</a></li>
+            <li><a href="/volunteer_connect/app/logout.php">Logout</a></li>
 
         <?php elseif (current_role() === 'attendee'): ?>
-            <li><a href="/attendee/events.php">Browse Events</a></li>
-            <li><a href="/attendee/my_bookings.php">My Bookings</a></li>
-            <li><a href="/logout.php">Logout</a></li>
+            <li><a href="/volunteer_connect/app/attendee/events.php">Browse Events</a></li>
+            <li><a href="/volunteer_connect/app/attendee/my_bookings.php">My Bookings</a></li>
+            <li><a href="/volunteer_connect/app/logout.php">Logout</a></li>
         <?php endif; ?>
     </ul>
 </nav>

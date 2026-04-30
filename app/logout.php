@@ -23,5 +23,5 @@ if (ini_get('session.use_cookies')) {
 // destroy the session on the server
 session_destroy();
 // redirect to login 
-header('Location: /login.php');
+header("Location: /volunteer_connect/app/index.php?msg=logged_out");
 exit();
