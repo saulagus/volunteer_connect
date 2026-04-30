@@ -40,11 +40,11 @@ require_once 'includes/header.php';
                     }
                 ?>
                 <a href="<?= $dashLink ?>" class="btn btnPrimary">Go to My Dashboard</a>
-                <a href="<?= $base ?>logout.php" class="btn btnSecondary">Log Out</a>
+                <a href="/volunteer_connect/app/logout.php" class="btn btnSecondary">Log Out</a>
             <?php else: ?>
                 <!-- If not logged in, show standard CTAs -->
-                <a href="register.php" class="btn btnPrimary">Start Volunteering</a>
-                <a href="login.php" class="btn btnSecondary">Login</a>
+                <a href="/volunteer_connect/app/register.php" class="btn btnPrimary">Start Volunteering</a>
+                <a href="/volunteer_connect/app/login.php" class="btn btnSecondary">Login</a>
             <?php endif; ?>
         </div>
     </section>
@@ -58,12 +58,12 @@ require_once 'includes/header.php';
         <div class="statCard">
             <h2><?= $event_count ?></h2>
             <p>Active Events</p>
-            <a href="login.php">Browse Opportunities</a>
+            <a href="/volunteer_connect/app/login.php">Browse Opportunities</a>
         </div>
         <div class="statCard">
             <h2><?= $volunteer_count ?></h2>
             <p>Volunteers Joined</p>
-            <a href="register.php">Join the Movement</a>
+            <a href="/volunteer_connect/app/register.php">Join the Movement</a>
         </div>
         <div class="statCard">
             <h2>100%</h2>
