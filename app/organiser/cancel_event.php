@@ -1,8 +1,8 @@
 <?php 
 // Session-check
-include 'organiser_check.php'; 
-require_once '../includes/db.php'; 
+require_once '../db.php'; 
 require_once '../includes/auth.php';
+session_start();
 require_role('organiser');
 
 // Check if the request is a POST and the ID exists

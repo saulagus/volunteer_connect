@@ -8,19 +8,20 @@ require_once 'includes/auth.php';
 if (is_logged_in()) {
     $role = current_role();
     if ($role === 'admin') {
-        header('Location: /admin/dashboard.php');
+        header('Location: admin/dashboard.php');
         exit();
     }
     if ($role === 'organiser') {
-        header('Location: /organiser/dashboard.php');
+        header('Location: organiser/dashboard.php');
         exit();
     }
     if ($role === 'attendee') {
-        header('Location: /attendee/events.php');
+        header('Location: attendee/events.php');
         exit();
     }
 }
 ?>
+
 <?php require_once 'includes/header.php'; ?>
 
 <main>

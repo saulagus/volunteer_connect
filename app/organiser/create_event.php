@@ -1,9 +1,17 @@
 <?php 
 // Session-check
-include 'organiser_check.php'; 
-require_once '../includes/db.php'; 
+require_once '../db.php'; 
 require_once '../includes/auth.php';
+session_start();
 require_role('organiser');
+
+// Initialize variables to empty strings so the form is clean on first load
+$title = "";
+$description = "";
+$location = "";
+$eventDate = "";
+$capacity = "";
+$categoryId = "";
 
 $error_msg = "";
 
