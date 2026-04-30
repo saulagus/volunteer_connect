@@ -16,6 +16,10 @@ require_once 'includes/header.php';
         <div class="flashSuccess">You have been successfully logged out. See you soon!</div>
     <?php endif; ?>
 
+    <?php if (isset($_GET['error']) && $_GET['error'] === 'unauthorized'): ?>
+        <div class="flashError">You are not authorised to access that page.</div>
+    <?php endif; ?>
+
     <!-- HERO SECTION -->
     <section style="text-align: center; padding: var(--space-7) 0; border-bottom: 1px solid var(--line);">
         <h1 style="font-size: var(--text-3xl); margin-bottom: var(--space-4);">Small acts, big impact.</h1>

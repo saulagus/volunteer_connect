@@ -104,10 +104,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($eventDate === '') {
         $errors[] = 'Event date is required.';
+    } elseif (!strtotime($eventDate)) {
+        $errors[] = 'Invalid date format.';
     }
 
     if ($capacity <= 0) {
         $errors[] = 'Capacity must be a positive number.';
+    } else {
+        $bStmt = $conn->prepare("SELECT COUNT(*) AS total FROM bookings WHERE eventId = ?");
+        $bStmt->bind_param("i", $eventId);
+        $bStmt->execute();
+        $currentBookings = $bStmt->get_result()->fetch_assoc()['total'];
+        $bStmt->close();
+        if ($capacity < $currentBookings) {
+            $errors[] = "Capacity cannot be less than current bookings ($currentBookings).";
+        }
     }
 
     $allowedStatuses = ['active', 'full', 'completed', 'cancelled'];
