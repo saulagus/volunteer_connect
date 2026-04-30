@@ -1,6 +1,6 @@
 <?php 
 // Session-check
-require_once '../db.php'; 
+require_once '../db_connect.php'; 
 require_once '../includes/auth.php';
 session_start();
 require_role('organiser');
