@@ -1,7 +1,7 @@
 <?php 
 // Session-check
 include 'organiser_check.php'; 
-require_once '../db.php'; 
+require_once '../includes/db.php'; 
 require_once '../includes/auth.php';
 require_role('organiser');
 
@@ -10,11 +10,11 @@ $error_msg = "";
 $success_msg = "";
 
 // Validate first if the ID exist in the URL
-if (!isset$_GET['id'])) {
+if (!isset($_GET['id'])) {
     header("Location: dashboard.php");
     exit();
 }
-$eventId = ((int)$_GET['id'];
+$eventId = (int)$_GET['id'];
 
 // Run if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_event'])) {
@@ -93,64 +93,76 @@ $cat_result = $conn->query("SELECT categoryId, name FROM categories");
 
 <?php require_once '../includes/header.php'; ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Event</title>
-</head>
-<body>
-    <h1>Edit Event: <?php echo htmlspecialchars($event['title']); ?></h1>
-    <a href="dashboard.php">Back to Dashboard</a>
+<main>
+    <div class="sectionHeader">
+        <h1>Edit Event</h1>
+        <a href="dashboard.php" class="btn btnSecondary">Return</a>
+    </div>
 
-    <?php if ($success_msg): ?>
-        <p style="color: green;"><?php echo htmlspecialchars($success_msg); ?></p>
-    <?php endif; ?>
-    
-    <?php if ($error_msg): ?>
-        <p style="color: red;"><?php echo htmlspecialchars($error_msg); ?></p>
-    <?php endif; ?>
+    <div class="formWrap">
+        
+        <?php if ($success_msg): ?>
+            <div class="formSuccess"><?= htmlspecialchars($success_msg) ?></div>
+        <?php endif; ?>
 
-    <form action="edit_event.php?id=<?php echo $eventId; ?>" method="POST">
-        <label>Event Title:</label><br>
-        <input type="text" name="title" value="<?php echo htmlspecialchars($event['title']); ?>" required><br><br>
+        <?php if ($error_msg): ?>
+            <div class="formErrors"><?= $error_msg ?></div>
+        <?php endif; ?>
 
-        <label>Description:</label><br>
-        <textarea name="description" required><?php echo htmlspecialchars($event['description']); ?></textarea><br><br>
+        <form action="" method="POST">
+            <div>
+                <label>Event Title</label>
+                <input type="text" name="title" value="<?= htmlspecialchars($event['title']) ?>" required>
+            </div>
 
-        <label>Location:</label><br>
-        <input type="text" name="location" value="<?php echo htmlspecialchars($event['location']); ?>" required><br><br>
+            <div>
+                <label>Description</label>
+                <textarea name="description" required><?= htmlspecialchars($event['description']) ?></textarea>
+            </div>
 
-        <label>Event Date and Time:</label><br>
-        <input type="datetime-local" name="eventDate" value="<?php echo date('Y-m-d\TH:i', strtotime($event['eventDate'])); ?>" required><br><br>
+            <div>
+                <label>Location</label>
+                <input type="text" name="location" value="<?= htmlspecialchars($event['location']) ?>" required>
+            </div>
 
-        <label>Capacity:</label><br>
-        <input type="number" name="capacity" value="<?php echo $event['capacity']; ?>" required><br><br>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                <div>
+                    <label>Date and Time</label>
+                    <input type="datetime-local" name="eventDate" 
+                           value="<?= date('Y-m-d\TH:i', strtotime($event['eventDate'])) ?>" required>
+                </div>
+                <div>
+                    <label>Capacity</label>
+                    <input type="number" name="capacity" value="<?= (int)$event['capacity'] ?>" min="1" required>
+                </div>
+            </div>
 
-        <label>Category:</label><br>
-        <select name="categoryId" required>
-            <?php while($cat = $cat_result->fetch_assoc()): ?>
-                <option value="<?php echo htmlspecialchars($cat['categoryId']); ?>" <?php echo ($cat['categoryId'] == $event['categoryId']) ? 'selected' : ''; ?>>
-                    <?php echo htmlspecialchars($cat['name']); ?>
-                </option>
-            <?php endwhile; ?>
-        </select><br><br>
+            <div>
+                <label>Category</label>
+                <select name="categoryId" required>
+                    <?php while($cat = $cat_result->fetch_assoc()): ?>
+                        <option value="<?= (int)$cat['categoryId'] ?>" 
+                                <?= ($cat['categoryId'] == $event['categoryId']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($cat['name']) ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
 
-        <label>Status:</label><br>
-        <select name="status">
-            <option value="active" <?php echo ($event['status'] == 'active') ? 'selected' : ''; ?>>Active</option>
-            <option value="full" <?php echo ($event['status'] == 'full') ? 'selected' : ''; ?>>Full</option>
-            <option value="completed" <?php echo ($event['status'] == 'completed') ? 'selected' : ''; ?>>Completed</option>
-            <option value="cancelled" <?php echo ($event['status'] == 'cancelled') ? 'selected' : ''; ?>>Cancelled</option>
-        </select><br><br>
+            <div>
+                <label>Event Status</label>
+                <select name="status">
+                    <option value="active" <?= ($event['status'] == 'active') ? 'selected' : '' ?>>Active</option>
+                    <option value="full" <?= ($event['status'] == 'full') ? 'selected' : '' ?>>Full</option>
+                    <option value="cancelled" <?= ($event['status'] == 'cancelled') ? 'selected' : '' ?>>Cancelled</option>
+                </select>
+            </div>
 
-        <button type="submit" name="update_event">Save Changes</button>
-    </form>
-</body>
-</html>
-
-<?php 
-$fetch_stmt->close();
-$conn->close(); 
-?>
+            <div class="formActions">
+                <button type="submit" name="update_event" class="btn btnPrimary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</main>
 
 <?php require_once '../includes/footer.php'; ?>
