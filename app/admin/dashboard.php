@@ -49,7 +49,7 @@ $eventStmt->close();
         <div class="statCard">
             <h2><?= htmlspecialchars($userCount) ?></h2>
             <p>Registered Users</p>
-            <a href="/admin/users.php">Manage Users</a>
+            <a href="/volunteer_connect/app/admin/users.php">Manage Users</a>
         </div>
 
         <div class="statCard">

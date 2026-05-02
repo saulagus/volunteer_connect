@@ -64,7 +64,7 @@ while ($row !== null) {
                                 <a href="edit_user.php?id=<?= (int)$user['userId'] ?>" class="btn btnSecondary">Edit</a>
                                 <form method="POST" action="delete_user.php" class="inlineForm">
                                     <input type="hidden" name="id" value="<?= (int)$user['userId'] ?>">
-                                    <button type="submit" class="btn btnDanger">Delete</button>
+                                    <button type="submit" class="btn btnDanger" onclick="return confirm('Delete this user? This cannot be undone.')">Delete</button>
                                 </form>
                             </div>
                         </td>

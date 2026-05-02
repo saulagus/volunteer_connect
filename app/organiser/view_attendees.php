@@ -1,15 +1,18 @@
 <?php 
-include 'organiser_check.php'; 
+// Session-check
 require_once '../db_connect.php'; 
+require_once '../includes/auth.php';
+session_start();
+require_role('organiser');
 
-$organiserId = $_SESSION['user_id'];
+$organiserId = (int)$_SESSION['user_id'];
 
 // Check if the Event ID is provided
 if (!isset($_GET['id'])) {
     header("Location: dashboard.php");
     exit();
 }
-$eventId = $_GET['id'];
+$eventId = (int)$_GET['id'];
 
 // Security Check to ensure event actually belong to this organiser
 $check_sql = "SELECT title FROM events WHERE eventId = ? AND organiserId = ?";
@@ -17,11 +20,11 @@ $check_stmt = $conn->prepare($check_sql);
 $check_stmt->bind_param("ii", $eventId, $organiserId);
 $check_stmt->execute();
 $event_result = $check_stmt->get_result();
+$event_data = $event_result->fetch_assoc(); 
 
-if ($event_result->num_rows === 0) {
+if (!$event_data) {
     die("Error: Event not found or you do not have permission to view it.");
 }
-$event_data = $event_result->fetch_assoc();
 
 // Fetch Attendees using JOIN
 // We join 'bookings' with 'users' to get the volunteer details
@@ -37,47 +40,48 @@ $stmt->execute();
 $attendees = $stmt->get_result();
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>View Attendees</title>
-</head>
-<body>
-    <h1>Attendees for: <?php echo htmlspecialchars($event_data['title']); ?></h1>
-    <a href="dashboard.php">Back to Dashboard</a>
+<?php require_once '../includes/header.php'; ?>
 
-    <hr>
+<main>
+    <div class="sectionHeader">
+        <h1>Attendees</h1>
+        <p>Event: <strong><?= htmlspecialchars($event_data['title']) ?></strong></p>
+        <a href="dashboard.php" class="btn btnSecondary" style="margin-top: var(--space-3)">Back to Dashboard</a>
+    </div>
 
-    <?php if ($attendees->num_rows > 0): ?>
-        <table border="1">
+    <!-- Using the tableWrap pattern from the CSS -->
+    <div class="tableWrap">
+        <table>
             <thead>
                 <tr>
                     <th>Volunteer Name</th>
                     <th>Email</th>
-                    <th>Date Signed Up</th>
+                    <th>Signed Up</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody>
-                <?php while($row = $attendees->fetch_assoc()): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($row['name']); ?></td>
-                    <td><?php echo htmlspecialchars($row['email']); ?></td>
-                    <td><?php echo $row['bookingDate']; ?></td>
-                    <td><?php echo $row['status']; ?></td>
-                </tr>
-                <?php endwhile; ?>
+                <?php if ($attendees->num_rows > 0): ?>
+                    <?php while($row = $attendees->fetch_assoc()): ?>
+                    <tr>
+                        <td><strong><?= htmlspecialchars($row['name']) ?></strong></td>
+                        <td><?= htmlspecialchars($row['email']) ?></td>
+                        <td><?= htmlspecialchars(date('d M Y', strtotime($row['bookingDate']))) ?></td>
+                        <td>
+                            <span class="statusBadge statusBooked">
+                                <?= htmlspecialchars(ucfirst($row['status'])) ?>
+                            </span>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="4" class="emptyState">No volunteers have signed up yet.</td>
+                    </tr>
+                <?php endif; ?>
             </tbody>
         </table>
-    <?php else: ?>
-        <p>No volunteers have signed up for this event yet.</p>
-    <?php endif; ?>
+    </div>
+</main>
 
-</body>
-</html>
-
-<?php 
-$stmt->close();
-$check_stmt->close();
-$conn->close(); 
-?>
+<?php require_once '../includes/footer.php'; ?>

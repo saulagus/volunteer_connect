@@ -1,6 +1,9 @@
 <?php 
-include 'organiser_check.php'; 
+// Session-check
 require_once '../db_connect.php'; 
+require_once '../includes/auth.php';
+session_start();
+require_role('organiser');
 
 $organiserId = $_SESSION['user_id'];
 $error_msg = "";
@@ -11,7 +14,7 @@ if (!isset($_GET['id'])) {
     header("Location: dashboard.php");
     exit();
 }
-$eventId = $_GET['id'];
+$eventId = (int)$_GET['id'];
 
 // Run if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_event'])) {
@@ -20,8 +23,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_event'])) {
     $description = strip_tags($_POST['description']);
     $location = strip_tags($_POST['location']);
     $eventDate = $_POST['eventDate'];
-    $capacity = $_POST['capacity'];
-    $categoryId = $_POST['categoryId'];
+    $capacity = (int)$_POST['capacity'];
+    $categoryId = (int)$_POST['categoryId'];
     $status = $_POST['status'];
 
     // Server-Side Validation
@@ -60,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_event'])) {
         if ($stmt->execute()) {
             $success_msg = "Event updated successfully!";
         } else {
-            $error_msg = "Error updating event: " . $stmt->error;
+            $error_msg = "Error updating event: " . htmlspecialchars($stmt->error);
         }
         $stmt->close();
     } else {
@@ -74,74 +77,92 @@ $fetch_sql = "SELECT * FROM events WHERE eventId = ? AND organiserId = ?";
 $fetch_stmt = $conn->prepare($fetch_sql);
 $fetch_stmt->bind_param("ii", $eventId, $organiserId);
 $fetch_stmt->execute();
-$event = $fetch_stmt->get_result()->fetch_assoc();
+$result = $fetch_stmt->get_result(); // Get the result object
+$event = $result->fetch_assoc(); //Fetch the associative array
 
 if (!$event) {
+    $fetch_stmt->close();
     // If no event found, or unauthorised ID show error
     header("Location: dashboard.php?error=notfound");
     exit();
 }
 
 // Also fetch categories for the dropdown
-$cat_result = $conn->query("SELECT * FROM categories");
+$cat_result = $conn->query("SELECT categoryId, name FROM categories");
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Event</title>
-</head>
-<body>
-    <h1>Edit Event: <?php echo htmlspecialchars($event['title']); ?></h1>
-    <a href="dashboard.php">Back to Dashboard</a>
+<?php require_once '../includes/header.php'; ?>
 
-    <?php if ($success_msg): ?>
-        <p style="color: green;"><?php echo $success_msg; ?></p>
-    <?php endif; ?>
-    
-    <?php if ($error_msg): ?>
-        <p style="color: red;"><?php echo $error_msg; ?></p>
-    <?php endif; ?>
+<main>
+    <div class="sectionHeader">
+        <h1>Edit Event</h1>
+        <a href="dashboard.php" class="btn btnSecondary">Return</a>
+    </div>
 
-    <form action="edit_event.php?id=<?php echo $eventId; ?>" method="POST">
-        <label>Event Title:</label><br>
-        <input type="text" name="title" value="<?php echo htmlspecialchars($event['title']); ?>" required><br><br>
+    <div class="formWrap">
+        
+        <?php if ($success_msg): ?>
+            <div class="formSuccess"><?= htmlspecialchars($success_msg) ?></div>
+        <?php endif; ?>
 
-        <label>Description:</label><br>
-        <textarea name="description" required><?php echo htmlspecialchars($event['description']); ?></textarea><br><br>
+        <?php if ($error_msg): ?>
+            <div class="formErrors"><?= $error_msg ?></div>
+        <?php endif; ?>
 
-        <label>Location:</label><br>
-        <input type="text" name="location" value="<?php echo htmlspecialchars($event['location']); ?>" required><br><br>
+        <form action="" method="POST">
+            <div>
+                <label>Event Title</label>
+                <input type="text" name="title" value="<?= htmlspecialchars($event['title']) ?>" required>
+            </div>
 
-        <label>Event Date and Time:</label><br>
-        <input type="datetime-local" name="eventDate" value="<?php echo date('Y-m-d\TH:i', strtotime($event['eventDate'])); ?>" required><br><br>
+            <div>
+                <label>Description</label>
+                <textarea name="description" required><?= htmlspecialchars($event['description']) ?></textarea>
+            </div>
 
-        <label>Capacity:</label><br>
-        <input type="number" name="capacity" value="<?php echo $event['capacity']; ?>" required><br><br>
+            <div>
+                <label>Location</label>
+                <input type="text" name="location" value="<?= htmlspecialchars($event['location']) ?>" required>
+            </div>
 
-        <label>Category:</label><br>
-        <select name="categoryId" required>
-            <?php while($cat = $cat_result->fetch_assoc()): ?>
-                <option value="<?php echo $cat['categoryId']; ?>" <?php echo ($cat['categoryId'] == $event['categoryId']) ? 'selected' : ''; ?>>
-                    <?php echo $cat['name']; ?>
-                </option>
-            <?php endwhile; ?>
-        </select><br><br>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                <div>
+                    <label>Date and Time</label>
+                    <input type="datetime-local" name="eventDate" 
+                           value="<?= date('Y-m-d\TH:i', strtotime($event['eventDate'])) ?>" required>
+                </div>
+                <div>
+                    <label>Capacity</label>
+                    <input type="number" name="capacity" value="<?= (int)$event['capacity'] ?>" min="1" required>
+                </div>
+            </div>
 
-        <label>Status:</label><br>
-        <select name="status">
-            <option value="active" <?php echo ($event['status'] == 'active') ? 'selected' : ''; ?>>Active</option>
-            <option value="full" <?php echo ($event['status'] == 'full') ? 'selected' : ''; ?>>Full</option>
-            <option value="completed" <?php echo ($event['status'] == 'completed') ? 'selected' : ''; ?>>Completed</option>
-            <option value="cancelled" <?php echo ($event['status'] == 'cancelled') ? 'selected' : ''; ?>>Cancelled</option>
-        </select><br><br>
+            <div>
+                <label>Category</label>
+                <select name="categoryId" required>
+                    <?php while($cat = $cat_result->fetch_assoc()): ?>
+                        <option value="<?= (int)$cat['categoryId'] ?>" 
+                                <?= ($cat['categoryId'] == $event['categoryId']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($cat['name']) ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
 
-        <button type="submit" name="update_event">Save Changes</button>
-    </form>
-</body>
-</html>
+            <div>
+                <label>Event Status</label>
+                <select name="status">
+                    <option value="active" <?= ($event['status'] == 'active') ? 'selected' : '' ?>>Active</option>
+                    <option value="full" <?= ($event['status'] == 'full') ? 'selected' : '' ?>>Full</option>
+                    <option value="cancelled" <?= ($event['status'] == 'cancelled') ? 'selected' : '' ?>>Cancelled</option>
+                </select>
+            </div>
 
-<?php 
-$fetch_stmt->close();
-$conn->close(); 
-?>
+            <div class="formActions">
+                <button type="submit" name="update_event" class="btn btnPrimary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<?php require_once '../includes/footer.php'; ?>

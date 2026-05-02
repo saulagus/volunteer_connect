@@ -1,31 +1,18 @@
 <?php
-// landing page or redirects logged-in users straight to their dashboard
-
 session_start();
+require_once 'db_connect.php';
 require_once 'includes/auth.php';
 
-// send logged-in users to the right place
-if (is_logged_in()) {
-    $role = current_role();
-    if ($role === 'admin') {
-        header('Location: /admin/dashboard.php');
-        exit();
-    }
-    if ($role === 'organiser') {
-        header('Location: /organiser/dashboard.php');
-        exit();
-    }
-    if ($role === 'attendee') {
-        header('Location: /attendee/events.php');
-        exit();
-    }
-}
+// Fetch numbers to use for homepage stats
+$event_count = $conn->query("SELECT COUNT(*) as total FROM events WHERE status = 'active'")->fetch_assoc()['total'];
+$volunteer_count = $conn->query("SELECT COUNT(*) as total FROM users WHERE role = 'attendee'")->fetch_assoc()['total'];
+
+require_once 'includes/header.php';
 ?>
-<?php require_once 'includes/header.php'; ?>
 
 <main class="landingMain">
 
-    <!-- hero-->
+    <!-- hero -->
     <section class="hero">
         <div class="heroInner">
             <p class="heroEyebrow">Open to everyone &mdash; free to join</p>
@@ -36,8 +23,8 @@ if (is_logged_in()) {
                 or create your own and manage your attendees.
             </p>
             <div class="heroBtns">
-                <a href="/register.php" class="btn btnHeroP">Get Started Free</a>
-                <a href="/login.php"    class="btn btnHeroS">Log In</a>
+                <a href="/volunteer_connect/app/register.php" class="btn btnHeroP">Get Started Free</a>
+                <a href="/volunteer_connect/app/login.php"    class="btn btnHeroS">Log In</a>
             </div>
         </div>
     </section>
@@ -46,13 +33,13 @@ if (is_logged_in()) {
     <section class="trustBar">
         <div class="trustInner">
             <div class="trustStat">
-                <span class="trustNum">500+</span>
+                <span class="trustNum"><?= (int)$volunteer_count ?></span>
                 <span class="trustLabel">Volunteers registered</span>
             </div>
             <div class="trustDivider" aria-hidden="true"></div>
             <div class="trustStat">
-                <span class="trustNum">120+</span>
-                <span class="trustLabel">Events organised</span>
+                <span class="trustNum"><?= (int)$event_count ?></span>
+                <span class="trustLabel">Active events</span>
             </div>
             <div class="trustDivider" aria-hidden="true"></div>
             <div class="trustStat">
@@ -105,7 +92,7 @@ if (is_logged_in()) {
                     Hundreds of community events need your time and energy.
                     Filter by date, search by cause, and book your place in seconds.
                 </p>
-                <a href="/register.php" class="btn btnPrimary">Browse Events</a>
+                <a href="/volunteer_connect/app/register.php" class="btn btnPrimary">Browse Events</a>
             </div>
 
             <div class="audienceCard audienceCardOrganiser">
@@ -115,7 +102,7 @@ if (is_logged_in()) {
                     Create an event, set a capacity, and watch registrations come in.
                     Manage your attendee list from a single dashboard.
                 </p>
-                <a href="/register.php" class="btn btnPrimary">Create an Event</a>
+                <a href="/volunteer_connect/app/register.php" class="btn btnPrimary">Create an Event</a>
             </div>
 
         </div>
@@ -126,7 +113,7 @@ if (is_logged_in()) {
         <div class="ctaBandInner">
             <h2 class="ctaBandTitle">Ready to get involved?</h2>
             <p class="ctaBandSub">Join a growing community of people who turn intention into action.</p>
-            <a href="/register.php" class="btn btnCtaBand">Create your free account</a>
+            <a href="/volunteer_connect/app/register.php" class="btn btnCtaBand">Create your free account</a>
         </div>
     </section>
 

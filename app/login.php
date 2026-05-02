@@ -42,13 +42,13 @@ if (isset($_POST['login_btn'])) {
             // Redirect based on role
             switch ($_SESSION['user_role']) {
             case 'admin':
-                header("Location: admin/dashboard.php");
+                header("Location: /volunteer_connect/app/admin/dashboard.php");
                 break;
             case 'organiser':
-                header("Location: organiser/dashboard.php");
+                header("Location: /volunteer_connect/app/organiser/dashboard.php");
                 break;
             case 'attendee':
-                header("Location: attendee/dashboard.php");
+                header("Location: /volunteer_connect/app/attendee/dashboard.php");
                 break;
             }
             exit();
@@ -96,7 +96,7 @@ if (isset($_POST['login_btn'])) {
         </form>
 
         <p class="authFooter">
-            Don't have an account? <a href="/register.php">Register here</a>
+            Don't have an account? <a href="/volunteer_connect/app/register.php">Register here</a>
         </p>
     </div>
 </main>

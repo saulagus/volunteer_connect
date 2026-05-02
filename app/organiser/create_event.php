@@ -1,6 +1,17 @@
-<?php
-include 'organiser_check.php';
-require_once '../db_connect.php';
+<?php 
+// Session-check
+require_once '../db_connect.php'; 
+require_once '../includes/auth.php';
+session_start();
+require_role('organiser');
+
+// Initialize variables to empty strings so the form is clean on first load
+$title = "";
+$description = "";
+$location = "";
+$eventDate = "";
+$capacity = "";
+$categoryId = "";
 
 $error_msg = "";
 
@@ -11,10 +22,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_event'])) {
     $description = strip_tags($_POST['description']);
     $location = strip_tags($_POST['location']);
     $eventDate = $_POST['eventDate'];
-    $capacity = $_POST['capacity'];
-    $categoryId = $_POST['categoryId'];
+    $capacity = (int)$_POST['capacity'];
+    $categoryId = (int)$_POST['categoryId'];
     // Linking the event to the logged-in user (organiserId)
-    $organiserId = $_SESSION['user_id']; 
+    $organiserId = (int)$_SESSION['user_id']; 
 
     // Server-Side Validation
     $errors = [];
@@ -58,10 +69,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_event'])) {
             // Always exit after a redirect
             exit();
         } else {
-            $error_msg = "Database error: " . $stmt->error;
+            $error_msg = "Database error: " . htmlspecialchars($stmt->error);
+            $stmt->close(); // Close if execute fails
         }
-
-        $stmt->close();
     } else {
         // If validation failed, then show all error messages
         $error_msg = implode("<br>", $errors);
@@ -69,51 +79,75 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_event'])) {
 }
 
 // Fetch categories to populate the dropdown
-$cat_sql = "SELECT * FROM categories";
+$cat_sql = "SELECT categoryId, name FROM categories";
 $cat_result = $conn->query($cat_sql);
 
 ?>
+<?php require_once '../includes/header.php'; ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Create Event</title>
-</head>
-<body>
-    <h1>Create New Volunteering Event</h1>
-    <a href="dashboard.php">Back to Dashboard</a>
 
-    <?php if ($error_msg): ?>
-        <p style="color: red;"><?php echo $error_msg; ?></p>
-    <?php endif; ?>
+<main>
+    <div class="sectionHeader">
+        <h1>Create New Volunteering Event</h1>
+        <a href="dashboard.php" class="btn btnSecondary">Back to Dashboard</a>
+    </div>
 
-    <form action="" method="POST">
-        <label>Event Title:</label><br>
-        <input type="text" name="title" required><br><br>
+    <!-- The CSS 'formWrap' provides the white card look and max-width -->
+    <div class="formWrap">
+        
+        <?php if ($error_msg): ?>
+            <!-- Using the semantic danger style from style.css -->
+            <div class="formErrors">
+                <?= $error_msg ?>
+            </div>
+        <?php endif; ?>
 
-        <label>Description:</label><br>
-        <textarea name="description" required></textarea><br><br>
+        <form action="" method="POST">
+            <div>
+                <label>Event Title</label>
+                <input type="text" name="title" placeholder="e.g. Community Garden Cleanup" value="<?= htmlspecialchars($title) ?>" required>
+            </div>
 
-        <label>Location:</label><br>
-        <input type="text" name="location" required><br><br>
+            <div>
+                <label>Description</label>
+                <textarea name="description" placeholder="Describe the tasks and requirements..." required><?= htmlspecialchars($description) ?></textarea>
+            </div>
 
-        <label>Event Date and Time:</label><br>
-        <input type="datetime-local" name="eventDate" required><br><br>
+            <div>
+                <label>Location</label>
+                <input type="text" name="location" placeholder="Enter address or venue" value="<?= htmlspecialchars($location) ?>" required>
+            </div>
 
-        <label>Capacity (Number of volunteers):</label><br>
-        <input type="number" name="capacity" min="1" required><br><br>
+            <!-- Using a simple inline grid for date and capacity -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                <div>
+                    <label>Event Date and Time</label>
+                    <input type="datetime-local" name="eventDate" value="<?= htmlspecialchars($eventDate) ?>" required>
+                </div>
 
-        <label>Category:</label><br>
-        <select name="categoryId" required>
-            <option value="">-- Select Category --</option>
-            <?php while($cat = $cat_result->fetch_assoc()): ?>
-                <option value="<?php echo $cat['categoryId']; ?>">
-                    <?php echo $cat['name']; ?>
-                </option>
-            <?php endwhile; ?>
-        </select><br><br>
+                <div>
+                    <label>Capacity</label>
+                    <input type="number" name="capacity" min="1" placeholder="Number of volunteers" value="<?= htmlspecialchars($capacity) ?>" required>
+                </div>
+            </div>
 
-        <button type="submit" name="submit_event">Create Event</button>
-    </form>
-</body>
-</html>
+            <div>
+                <label>Category</label>
+                <select name="categoryId" required>
+                    <option value="">-- Select Category --</option>
+                    <?php while($cat = $cat_result->fetch_assoc()): ?>
+                        <option value="<?= (int)$cat['categoryId'] ?>" <?= ($categoryId == $cat['categoryId']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($cat['name']) ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+
+            <div class="formActions">
+                <button type="submit" name="submit_event" class="btn btnPrimary">Create Event</button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<?php require_once '../includes/footer.php'; ?>

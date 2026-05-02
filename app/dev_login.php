@@ -11,6 +11,6 @@ if (!isset($accounts[$role])) { die('Unknown role'); }
 $_SESSION['user_id']   = $id;
 $_SESSION['user_name'] = $name;
 $_SESSION['user_role'] = $r;
-$redirects = ['admin' => '/admin/dashboard.php', 'organiser' => '/organiser/dashboard.php', 'attendee' => '/attendee/events.php'];
+$redirects = ['admin' => '/volunteer_connect/app/admin/dashboard.php', 'organiser' => '/volunteer_connect/app/organiser/dashboard.php', 'attendee' => '/volunteer_connect/app/attendee/events.php'];
 header('Location: ' . $redirects[$role]);
 exit();
