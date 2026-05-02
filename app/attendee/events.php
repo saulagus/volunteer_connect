@@ -33,44 +33,34 @@ while ($row !== null) {
 <main>
     <h1>Browse Events</h1>
 
-    <!-- upcoming events table -->
-    <div class="tableWrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Category</th>
-                    <th>Location</th>
-                    <th>Date</th>
-                    <th>Organiser</th>
-                    <th>Places Left</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($events)): ?>
-                    <tr>
-                        <td colspan="7" class="emptyState">No upcoming events right now. Check back soon.</td>
-                    </tr>
-                <?php endif; ?>
-                <?php foreach ($events as $event): ?>
-                    <?php $placesLeft = (int)$event['capacity'] - (int)$event['bookedCount']; ?>
-                    <tr>
-                        <td><?= htmlspecialchars($event['title']) ?></td>
-                        <td><?= htmlspecialchars($event['categoryName'] ?? '-') ?></td>
-                        <td><?= htmlspecialchars($event['location']) ?></td>
-                        <td><?= htmlspecialchars(date('d M Y, H:i', strtotime($event['eventDate']))) ?></td>
-                        <td><?= htmlspecialchars($event['organiserName']) ?></td>
-                        <td><?= max(0, $placesLeft) ?> of <?= (int)$event['capacity'] ?></td>
-                        <td>
-                            <div class="tableActions">
-                                <a href="event_detail.php?id=<?= (int)$event['eventId'] ?>" class="btn btnSecondary">View</a>
-                            </div>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+    <!-- upcoming events as a card grid -->
+    <div class="eventGrid">
+        <?php if (empty($events)): ?>
+            <div class="eventGridEmpty">No upcoming events right now. Check back soon.</div>
+        <?php endif; ?>
+        <?php foreach ($events as $event): ?>
+            <?php $placesLeft = (int)$event['capacity'] - (int)$event['bookedCount']; ?>
+            <article class="eventCard">
+                <span class="eventCardCategory"><?= htmlspecialchars($event['categoryName'] ?? 'General') ?></span>
+
+                <h2 class="eventCardTitle"><?= htmlspecialchars($event['title']) ?></h2>
+
+                <div class="eventCardMeta">
+                    <span><strong>When</strong> <?= htmlspecialchars(date('d M Y, H:i', strtotime($event['eventDate']))) ?></span>
+                    <span><strong>Where</strong> <?= htmlspecialchars($event['location']) ?></span>
+                    <span><strong>Hosted by</strong> <?= htmlspecialchars($event['organiserName']) ?></span>
+                </div>
+
+                <div class="eventCardCapacity">
+                    <span>Places left</span>
+                    <span class="eventCardCapacityNum"><?= max(0, $placesLeft) ?> / <?= (int)$event['capacity'] ?></span>
+                </div>
+
+                <div class="eventCardActions">
+                    <a href="event_detail.php?id=<?= (int)$event['eventId'] ?>" class="btn btnPrimary">View &amp; Book</a>
+                </div>
+            </article>
+        <?php endforeach; ?>
     </div>
 </main>
 

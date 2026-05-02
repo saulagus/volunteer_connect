@@ -29,17 +29,17 @@ if (isset($pageTitle)) {
         <?php elseif (current_role() === 'admin'): ?>
             <li><a href="/volunteer_connect/app/admin/dashboard.php">Dashboard</a></li>
             <li><a href="/volunteer_connect/app/admin/users.php">Users</a></li>
-            <li><a href="/volunteer_connect/app/logout.php">Logout</a></li>
+            <li><a href="/volunteer_connect/app/logout.php" onclick="return confirm('Log out of Volunteer Connect?');">Logout</a></li>
 
         <?php elseif (current_role() === 'organiser'): ?>
             <li><a href="/volunteer_connect/app/organiser/dashboard.php">My Events</a></li>
             <li><a href="/volunteer_connect/app/organiser/create_event.php">Create Event</a></li>
-            <li><a href="/volunteer_connect/app/logout.php">Logout</a></li>
+            <li><a href="/volunteer_connect/app/logout.php" onclick="return confirm('Log out of Volunteer Connect?');">Logout</a></li>
 
         <?php elseif (current_role() === 'attendee'): ?>
             <li><a href="/volunteer_connect/app/attendee/events.php">Browse Events</a></li>
             <li><a href="/volunteer_connect/app/attendee/my_bookings.php">My Bookings</a></li>
-            <li><a href="/volunteer_connect/app/logout.php">Logout</a></li>
+            <li><a href="/volunteer_connect/app/logout.php" onclick="return confirm('Log out of Volunteer Connect?');">Logout</a></li>
         <?php endif; ?>
     </ul>
 </nav>
