@@ -23,8 +23,25 @@ require_once 'includes/header.php';
                 or create your own and manage your attendees.
             </p>
             <div class="heroBtns">
-                <a href="/volunteer_connect/app/register.php" class="btn btnHeroP">Get Started Free</a>
-                <a href="/volunteer_connect/app/login.php"    class="btn btnHeroS">Log In</a>
+                <?php if (is_logged_in()): ?>
+                    <?php
+                        // pick the dashboard link for the user's role
+                        $role = current_role();
+                        if ($role === 'admin') {
+                            $dashLink = "/volunteer_connect/app/admin/dashboard.php";
+                        } elseif ($role === 'organiser') {
+                            $dashLink = "/volunteer_connect/app/organiser/dashboard.php";
+                        } else {
+                            $dashLink = "/volunteer_connect/app/attendee/dashboard.php";
+                        }
+                    ?>
+                    <a href="<?= $dashLink ?>" class="btn btnHeroP">Go to My Dashboard</a>
+                    <a href="/volunteer_connect/app/logout.php" class="btn btnHeroS"
+                       onclick="return confirm('Log out of Volunteer Connect?');">Log Out</a>
+                <?php else: ?>
+                    <a href="/volunteer_connect/app/register.php" class="btn btnHeroP">Get Started Free</a>
+                    <a href="/volunteer_connect/app/login.php"    class="btn btnHeroS">Log In</a>
+                <?php endif; ?>
             </div>
         </div>
     </section>
@@ -57,21 +74,21 @@ require_once 'includes/header.php';
 
             <ol class="stepsList">
                 <li class="stepItem">
-                    <span class="stepNum">01</span>
+                    <span class="stepNum">1</span>
                     <div class="stepBody">
                         <h3 class="stepTitle">Create a free account</h3>
                         <p class="stepDesc">Register in under a minute as a volunteer or an event organiser. No fees, no friction.</p>
                     </div>
                 </li>
                 <li class="stepItem">
-                    <span class="stepNum">02</span>
+                    <span class="stepNum">2</span>
                     <div class="stepBody">
                         <h3 class="stepTitle">Find or create an event</h3>
                         <p class="stepDesc">Browse upcoming opportunities by date or location — or post your own event and set the capacity.</p>
                     </div>
                 </li>
                 <li class="stepItem">
-                    <span class="stepNum">03</span>
+                    <span class="stepNum">3</span>
                     <div class="stepBody">
                         <h3 class="stepTitle">Show up and make an impact</h3>
                         <p class="stepDesc">Book your spot with one click. Organisers get a live attendee list; volunteers get a confirmation.</p>

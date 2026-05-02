@@ -37,6 +37,7 @@ if (isset($pageTitle)) {
             <li><a href="/volunteer_connect/app/logout.php" onclick="return confirm('Log out of Volunteer Connect?');">Logout</a></li>
 
         <?php elseif (current_role() === 'attendee'): ?>
+            <li><a href="/volunteer_connect/app/attendee/dashboard.php">Dashboard</a></li>
             <li><a href="/volunteer_connect/app/attendee/events.php">Browse Events</a></li>
             <li><a href="/volunteer_connect/app/attendee/my_bookings.php">My Bookings</a></li>
             <li><a href="/volunteer_connect/app/logout.php" onclick="return confirm('Log out of Volunteer Connect?');">Logout</a></li>
