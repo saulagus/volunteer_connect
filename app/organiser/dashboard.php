@@ -13,7 +13,7 @@ $totalQuery = $conn->query("SELECT COUNT(*) as count FROM events WHERE organiser
 $totalCount = $totalQuery->fetch_assoc()['count'];
 
 // Total Volunteers (across all your events)
-$volQuery = $conn->query("SELECT COUNT(*) as count FROM bookings b JOIN events e ON b.eventId = e.eventId WHERE e.organiserId = $myId AND b.status = 'booked'");
+$volQuery = $conn->query("SELECT COUNT(*) as count FROM bookings JOIN events ON bookings.eventId = events.eventId WHERE events.organiserId = $myId AND bookings.status = 'booked'");
 $volCount = $volQuery->fetch_assoc()['count'];
 
 // For Data Integrity, fetch only events created by this organiser

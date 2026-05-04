@@ -8,16 +8,16 @@ require_role('attendee');
 // only show events that are still open and haven't already happened, soonest first.
 // the subquery gives us the booked count per event so we can show places left.
 $result = $conn->query(
-    "SELECT e.eventId, e.title, e.location, e.eventDate, e.capacity,
-            c.name AS categoryName,
-            u.name AS organiserName,
-            (SELECT COUNT(*) FROM bookings b
-             WHERE b.eventId = e.eventId AND b.status = 'booked') AS bookedCount
-     FROM events e
-     LEFT JOIN categories c ON e.categoryId = c.categoryId
-     JOIN users u ON e.organiserId = u.userId
-     WHERE e.status = 'active' AND e.eventDate >= NOW()
-     ORDER BY e.eventDate ASC");
+    "SELECT events.eventId, events.title, events.location, events.eventDate, events.capacity,
+            categories.name AS categoryName,
+            users.name AS organiserName,
+            (SELECT COUNT(*) FROM bookings
+             WHERE bookings.eventId = events.eventId AND bookings.status = 'booked') AS bookedCount
+     FROM events
+     LEFT JOIN categories ON events.categoryId = categories.categoryId
+     JOIN users ON events.organiserId = users.userId
+     WHERE events.status = 'active' AND events.eventDate >= NOW()
+     ORDER BY events.eventDate ASC");
 // collect all rows into an array to loop through in the HTML
 $events = [];
 $row = $result->fetch_assoc();

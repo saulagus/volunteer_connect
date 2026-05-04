@@ -28,11 +28,10 @@ if (!$event_data) {
 
 // Fetch Attendees using JOIN
 // We join 'bookings' with 'users' to get the volunteer details
-// Using b as an alias for the bookings table and u as an alias for the users table
-$sql = "SELECT u.name, u.email, b.bookingDate, b.status 
-        FROM bookings b
-        INNER JOIN users u ON b.userId = u.userId
-        WHERE b.eventId = ?";
+$sql = "SELECT users.name, users.email, bookings.bookingDate, bookings.status
+        FROM bookings
+        INNER JOIN users ON bookings.userId = users.userId
+        WHERE bookings.eventId = ?";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $eventId);

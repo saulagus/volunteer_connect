@@ -90,14 +90,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_btn'])) {
 
 // fetch the event with its category and organiser for display
 $stmt = $conn->prepare(
-    "SELECT e.eventId, e.title, e.description, e.location, e.eventDate,
-            e.capacity, e.status,
-            c.name AS categoryName,
-            u.name AS organiserName
-     FROM events e
-     LEFT JOIN categories c ON e.categoryId = c.categoryId
-     JOIN users u ON e.organiserId = u.userId
-     WHERE e.eventId = ?");
+    "SELECT events.eventId, events.title, events.description, events.location, events.eventDate,
+            events.capacity, events.status,
+            categories.name AS categoryName,
+            users.name AS organiserName
+     FROM events
+     LEFT JOIN categories ON events.categoryId = categories.categoryId
+     JOIN users ON events.organiserId = users.userId
+     WHERE events.eventId = ?");
 $stmt->bind_param("i", $eventId);
 $stmt->execute();
 $event = $stmt->get_result()->fetch_assoc();

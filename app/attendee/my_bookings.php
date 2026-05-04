@@ -11,12 +11,12 @@ $userId = (int)$_SESSION['user_id'];
 // pull all bookings for this user along with the event detail.
 // upcoming events naturally sort to the top with DESC so the user sees what's next first.
 $stmt = $conn->prepare(
-    "SELECT b.bookingId, b.status AS bookingStatus, b.bookingDate,
-            e.eventId, e.title, e.location, e.eventDate, e.status AS eventStatus
-     FROM bookings b
-     JOIN events e ON b.eventId = e.eventId
-     WHERE b.userId = ?
-     ORDER BY e.eventDate DESC");
+    "SELECT bookings.bookingId, bookings.status AS bookingStatus, bookings.bookingDate,
+            events.eventId, events.title, events.location, events.eventDate, events.status AS eventStatus
+     FROM bookings
+     JOIN events ON bookings.eventId = events.eventId
+     WHERE bookings.userId = ?
+     ORDER BY events.eventDate DESC");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $result = $stmt->get_result();

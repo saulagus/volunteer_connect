@@ -11,9 +11,9 @@ $userId = (int)$_SESSION['user_id'];
 // count this user's upcoming bookings (still booked and the event hasn't happened yet)
 $stmt = $conn->prepare(
     "SELECT COUNT(*) AS total
-     FROM bookings b
-     JOIN events e ON b.eventId = e.eventId
-     WHERE b.userId = ? AND b.status = 'booked' AND e.eventDate >= NOW()");
+     FROM bookings
+     JOIN events ON bookings.eventId = events.eventId
+     WHERE bookings.userId = ? AND bookings.status = 'booked' AND events.eventDate >= NOW()");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $upcomingRow   = $stmt->get_result()->fetch_assoc();
@@ -30,13 +30,13 @@ $availableCount = (int)$availableRow['total'];
 
 // fetch the user's upcoming bookings with event detail for the table below
 $stmt = $conn->prepare(
-    "SELECT e.eventId, e.title, e.eventDate, e.location, e.status,
-            u.name AS organiserName
-     FROM bookings b
-     JOIN events e ON b.eventId = e.eventId
-     JOIN users  u ON e.organiserId = u.userId
-     WHERE b.userId = ? AND b.status = 'booked' AND e.eventDate >= NOW()
-     ORDER BY e.eventDate ASC");
+    "SELECT events.eventId, events.title, events.eventDate, events.location, events.status,
+            users.name AS organiserName
+     FROM bookings
+     JOIN events ON bookings.eventId = events.eventId
+     JOIN users ON events.organiserId = users.userId
+     WHERE bookings.userId = ? AND bookings.status = 'booked' AND events.eventDate >= NOW()
+     ORDER BY events.eventDate ASC");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $bookingsResult = $stmt->get_result();
