@@ -6,6 +6,10 @@ app/db_connect.php
 .env
 *.env
 
+# Local dev tools (not for submission)
+app/dev_login.php
+test_data.sql
+
 # OS / editor
 .DS_Store
 Thumbs.db
